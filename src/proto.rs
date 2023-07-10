@@ -1,7 +1,6 @@
 use extism_pdk::*;
 use proto_pdk::*;
 use serde::Deserialize;
-use std::collections::HashMap;
 
 static NAME: &str = "Deno";
 static BIN: &str = "deno";
@@ -23,7 +22,7 @@ pub fn download_prebuilt(
 
     let arch = match input.env.arch {
         HostArch::Arm64 => "aarch64",
-        HostArch::X64 => "x64",
+        HostArch::X64 => "x86_64",
         other => {
             return Err(PluginError::UnsupportedArchitecture {
                 tool: NAME.into(),
@@ -33,8 +32,9 @@ pub fn download_prebuilt(
     };
 
     let prefix = match input.env.os {
-        HostOS::Linux => format!("bun-linux-{arch}"),
-        HostOS::MacOS => format!("bun-darwin-{arch}"),
+        HostOS::Linux => format!("deno-{arch}-unknown-linux-gnu"),
+        HostOS::MacOS => format!("deno-{arch}-apple-darwin"),
+        HostOS::Windows => format!("deno-{arch}-pc-windows-msvc"),
         other => {
             return Err(PluginError::UnsupportedPlatform {
                 tool: NAME.into(),
@@ -46,14 +46,10 @@ pub fn download_prebuilt(
     let filename = format!("{prefix}.zip");
 
     Ok(Json(DownloadPrebuiltOutput {
-        archive_prefix: Some(prefix),
         download_url: format!(
-            "https://github.com/oven-sh/bun/releases/download/bun-v{version}/{filename}"
+            "https://github.com/denoland/deno/releases/download/v{version}/{filename}"
         ),
         download_name: Some(filename),
-        checksum_url: Some(format!(
-            "https://github.com/oven-sh/bun/releases/download/bun-v{version}/SHASUMS256.txt"
-        )),
         ..DownloadPrebuiltOutput::default()
     }))
 }
@@ -62,11 +58,15 @@ pub fn download_prebuilt(
 pub fn locate_bins(Json(input): Json<LocateBinsInput>) -> FnResult<Json<LocateBinsOutput>> {
     Ok(Json(LocateBinsOutput {
         bin_path: Some(if input.env.os == HostOS::Windows {
-            format!("{}.exe", BIN) // Not supported yet
+            format!("{}.exe", BIN)
         } else {
-            format!("{}", BIN)
+            BIN.into()
         }),
-        globals_lookup_dirs: vec!["$HOME/.bun/bin".into()],
+        globals_lookup_dirs: vec![
+            "$DENO_INSTALL_ROOT/bin".into(),
+            "$DENO_HOME/bin".into(),
+            "$HOME/.deno/bin".into(),
+        ],
     }))
 }
 
@@ -80,10 +80,10 @@ pub fn load_versions(Json(_): Json<LoadVersionsInput>) -> FnResult<Json<LoadVers
     let mut output = LoadVersionsOutput::default();
     let mut latest = Version::new(0, 0, 0);
 
-    let response: Vec<TagEntry> = fetch_url("https://api.github.com/repos/oven-sh/bun/tags")?;
+    let response: Vec<TagEntry> = fetch_url("https://api.github.com/repos/denoland/deno/tags")?;
     let tags = response
         .iter()
-        .filter_map(|entry| entry.name.strip_prefix("bun-v"))
+        .filter_map(|entry| entry.name.strip_prefix('v'))
         .collect::<Vec<_>>();
 
     for tag in tags {
@@ -102,19 +102,8 @@ pub fn load_versions(Json(_): Json<LoadVersionsInput>) -> FnResult<Json<LoadVers
 }
 
 #[plugin_fn]
-pub fn create_shims(Json(_): Json<CreateShimsInput>) -> FnResult<Json<CreateShimsOutput>> {
-    let mut global_shims = HashMap::new();
-
-    global_shims.insert(
-        "bunx".into(),
-        ShimConfig {
-            before_args: Some("x".into()),
-            ..ShimConfig::default()
-        },
-    );
-
-    Ok(Json(CreateShimsOutput {
-        global_shims,
-        ..CreateShimsOutput::default()
+pub fn detect_version_files(_: ()) -> FnResult<Json<DetectVersionOutput>> {
+    Ok(Json(DetectVersionOutput {
+        files: vec![".dvmrc".into()],
     }))
 }
