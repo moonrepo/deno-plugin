@@ -17,40 +17,30 @@ pub fn register_tool(Json(_): Json<ToolMetadataInput>) -> FnResult<Json<ToolMeta
 pub fn download_prebuilt(
     Json(input): Json<DownloadPrebuiltInput>,
 ) -> FnResult<Json<DownloadPrebuiltOutput>> {
-    let version = input.env.version;
+    check_supported_os_and_arch(
+        NAME,
+        &input.env,
+        permutations! [
+            HostOS::Linux => [HostArch::X64],
+            HostOS::MacOS => [HostArch::X64, HostArch::Arm64],
+            HostOS::Windows => [HostArch::X64],
+        ],
+    )?;
 
-    // How granular do we want to get here?
-    if input.env.arch == HostArch::Arm64 && input.env.os != HostOS::MacOS {
-        return Err(PluginError::UnsupportedArchitecture {
-            tool: NAME.into(),
-            arch: input.env.arch.to_string(),
-        })?;
-    }
+    let version = input.env.version;
 
     let arch = match input.env.arch {
         HostArch::Arm64 => "aarch64",
         HostArch::X64 => "x86_64",
-        other => {
-            return Err(PluginError::UnsupportedArchitecture {
-                tool: NAME.into(),
-                arch: other.to_string(),
-            })?;
-        }
+        _ => unreachable!(),
     };
 
-    let prefix = match input.env.os {
-        HostOS::Linux => format!("deno-{arch}-unknown-linux-gnu"),
-        HostOS::MacOS => format!("deno-{arch}-apple-darwin"),
-        HostOS::Windows => format!("deno-{arch}-pc-windows-msvc"),
-        other => {
-            return Err(PluginError::UnsupportedPlatform {
-                tool: NAME.into(),
-                platform: other.to_string(),
-            })?;
-        }
+    let filename = match input.env.os {
+        HostOS::Linux => format!("deno-{arch}-unknown-linux-gnu.zip"),
+        HostOS::MacOS => format!("deno-{arch}-apple-darwin.zip"),
+        HostOS::Windows => format!("deno-{arch}-pc-windows-msvc.zip"),
+        _ => unreachable!(),
     };
-
-    let filename = format!("{prefix}.zip");
 
     Ok(Json(DownloadPrebuiltOutput {
         download_url: format!(
@@ -64,11 +54,7 @@ pub fn download_prebuilt(
 #[plugin_fn]
 pub fn locate_bins(Json(input): Json<LocateBinsInput>) -> FnResult<Json<LocateBinsOutput>> {
     Ok(Json(LocateBinsOutput {
-        bin_path: Some(if input.env.os == HostOS::Windows {
-            format!("{}.exe", BIN)
-        } else {
-            BIN.into()
-        }),
+        bin_path: Some(format_bin_name(BIN, input.env.os)),
         fallback_last_globals_dir: true,
         globals_lookup_dirs: vec![
             "$DENO_INSTALL_ROOT".into(),

@@ -3,8 +3,9 @@ use proto_pdk_test_utils::{create_plugin, generate_resolve_versions_tests};
 use starbase_sandbox::create_empty_sandbox;
 
 generate_resolve_versions_tests!("deno-test", {
-    "0.4" => "0.4.0",
-    "0.5.1" => "0.5.1",
+    "1.19" => "1.19.3",
+    "1.11" => "1.11.5",
+    "1.9.2" => "1.9.2",
 });
 
 #[test]
