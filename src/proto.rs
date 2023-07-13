@@ -19,6 +19,14 @@ pub fn download_prebuilt(
 ) -> FnResult<Json<DownloadPrebuiltOutput>> {
     let version = input.env.version;
 
+    // How granular do we want to get here?
+    if input.env.arch == HostArch::Arm64 && input.env.os != HostOS::MacOS {
+        return Err(PluginError::UnsupportedArchitecture {
+            tool: NAME.into(),
+            arch: input.env.arch.to_string(),
+        })?;
+    }
+
     let arch = match input.env.arch {
         HostArch::Arm64 => "aarch64",
         HostArch::X64 => "x86_64",
