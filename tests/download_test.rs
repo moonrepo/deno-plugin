@@ -6,7 +6,7 @@ use std::path::PathBuf;
 generate_download_install_tests!("deno-test", "1.30.0");
 
 #[test]
-#[should_panic(expected = "Unable to install Deno, unsupported architecture arm64.")]
+#[should_panic(expected = "Unable to install Deno, unsupported architecture arm64 for linux.")]
 fn doesnt_support_linux_arm64() {
     let sandbox = create_empty_sandbox();
     let plugin = create_plugin("bun-test", sandbox.path());
@@ -111,7 +111,7 @@ fn supports_macos_x64() {
 }
 
 #[test]
-#[should_panic(expected = "Unable to install Deno, unsupported architecture arm64.")]
+#[should_panic(expected = "Unable to install Deno, unsupported architecture arm64 for windows.")]
 fn doesnt_support_windows_arm64() {
     let sandbox = create_empty_sandbox();
     let plugin = create_plugin("bun-test", sandbox.path());
