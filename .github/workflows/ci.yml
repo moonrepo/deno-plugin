@@ -45,4 +45,5 @@ jobs:
       - uses: moonrepo/setup-rust@v0
         with:
           bins: cargo-wasi, cargo-nextest
-      - run: cargo wasi build -p deno_plugin
+      - run: cargo wasi build
+      - run: cargo nextest run
