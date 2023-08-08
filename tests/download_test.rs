@@ -1,5 +1,4 @@
-use proto_pdk::*;
-use proto_pdk_test_utils::{create_plugin, generate_download_install_tests};
+use proto_pdk_test_utils::*;
 use starbase_sandbox::create_empty_sandbox;
 use std::path::PathBuf;
 
@@ -22,7 +21,6 @@ fn doesnt_support_linux_arm64() {
         }),
         DownloadPrebuiltOutput {
             archive_prefix: None,
-            bin_path: None,
             checksum_name: None,
             checksum_url: None,
             download_name: Some("deno-aarch64-unknown-linux-gnu.zip".into()),
@@ -49,7 +47,6 @@ fn supports_linux_x64() {
         }),
         DownloadPrebuiltOutput {
             archive_prefix: None,
-            bin_path: None,
             checksum_name: None,
             checksum_url: None,
             download_name: Some("deno-x86_64-unknown-linux-gnu.zip".into()),
@@ -74,7 +71,6 @@ fn supports_macos_arm64() {
         }),
         DownloadPrebuiltOutput {
             archive_prefix: None,
-            bin_path: None,
             checksum_name: None,
             checksum_url: None,
             download_name: Some("deno-aarch64-apple-darwin.zip".into()),
@@ -101,7 +97,6 @@ fn supports_macos_x64() {
         }),
         DownloadPrebuiltOutput {
             archive_prefix: None,
-            bin_path: None,
             checksum_name: None,
             checksum_url: None,
             download_name: Some("deno-x86_64-apple-darwin.zip".into()),
@@ -127,7 +122,6 @@ fn doesnt_support_windows_arm64() {
         }),
         DownloadPrebuiltOutput {
             archive_prefix: None,
-            bin_path: None,
             checksum_name: None,
             checksum_url: None,
             download_name: Some("deno-aarch64-pc-windows-msvc.zip".into()),
@@ -152,7 +146,6 @@ fn supports_windows_x64() {
         }),
         DownloadPrebuiltOutput {
             archive_prefix: None,
-            bin_path: None,
             checksum_name: None,
             checksum_url: None,
             download_name: Some("deno-x86_64-pc-windows-msvc.zip".into()),
@@ -175,7 +168,8 @@ fn locates_unix_bin() {
                     version: "1.2.0".into(),
                     ..Default::default()
                 },
-                tool_dir: PathBuf::new()
+                home_dir: PathBuf::new(),
+                tool_dir: PathBuf::new(),
             })
             .bin_path,
         Some("deno".into())
@@ -196,7 +190,8 @@ fn locates_windows_bin() {
                     version: "1.2.0".into(),
                     ..Default::default()
                 },
-                tool_dir: PathBuf::new()
+                home_dir: PathBuf::new(),
+                tool_dir: PathBuf::new(),
             })
             .bin_path,
         Some("deno.exe".into())
