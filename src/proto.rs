@@ -61,6 +61,7 @@ pub fn locate_bins(Json(input): Json<LocateBinsInput>) -> FnResult<Json<LocateBi
             "$DENO_HOME/bin".into(),
             "$HOME/.deno/bin".into(),
         ],
+        ..LocateBinsOutput::default()
     }))
 }
 
