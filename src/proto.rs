@@ -1,6 +1,11 @@
 use extism_pdk::*;
 use proto_pdk::*;
 
+#[host_fn]
+extern "ExtismHost" {
+    fn exec_command(input: Json<ExecCommandInput>) -> Json<ExecCommandOutput>;
+}
+
 static NAME: &str = "Deno";
 static BIN: &str = "deno";
 
@@ -9,6 +14,7 @@ pub fn register_tool(Json(_): Json<ToolMetadataInput>) -> FnResult<Json<ToolMeta
     Ok(Json(ToolMetadataOutput {
         name: NAME.into(),
         type_of: PluginType::Language,
+        plugin_version: Some(env!("CARGO_PKG_VERSION").into()),
         ..ToolMetadataOutput::default()
     }))
 }
@@ -75,7 +81,7 @@ pub fn load_versions(Json(_): Json<LoadVersionsInput>) -> FnResult<Json<LoadVers
         .filter_map(|t| t.strip_prefix('v').map(|t| t.to_owned()))
         .collect::<Vec<_>>();
 
-    Ok(Json(LoadVersionsOutput::from_tags(&tags)?))
+    Ok(Json(LoadVersionsOutput::from(tags)?))
 }
 
 #[plugin_fn]
@@ -83,4 +89,25 @@ pub fn detect_version_files(_: ()) -> FnResult<Json<DetectVersionOutput>> {
     Ok(Json(DetectVersionOutput {
         files: vec![".dvmrc".into()],
     }))
+}
+
+#[plugin_fn]
+pub fn install_global(
+    Json(input): Json<InstallGlobalInput>,
+) -> FnResult<Json<InstallGlobalOutput>> {
+    let result = exec_command!(
+        BIN,
+        ["install", "--allow-net", "--allow-read", &input.dependency]
+    );
+
+    Ok(Json(InstallGlobalOutput::from_exec_command(result)))
+}
+
+#[plugin_fn]
+pub fn uninstall_global(
+    Json(input): Json<UninstallGlobalInput>,
+) -> FnResult<Json<UninstallGlobalOutput>> {
+    let result = exec_command!(BIN, ["uninstall", &input.dependency]);
+
+    Ok(Json(UninstallGlobalOutput::from_exec_command(result)))
 }
