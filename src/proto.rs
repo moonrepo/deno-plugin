@@ -23,9 +23,11 @@ pub fn register_tool(Json(_): Json<ToolMetadataInput>) -> FnResult<Json<ToolMeta
 pub fn download_prebuilt(
     Json(input): Json<DownloadPrebuiltInput>,
 ) -> FnResult<Json<DownloadPrebuiltOutput>> {
+    let env = get_proto_environment()?;
+
     check_supported_os_and_arch(
         NAME,
-        &input.env,
+        &env,
         permutations! [
             HostOS::Linux => [HostArch::X64],
             HostOS::MacOS => [HostArch::X64, HostArch::Arm64],
@@ -33,15 +35,15 @@ pub fn download_prebuilt(
         ],
     )?;
 
-    let version = input.env.version;
+    let version = input.state.version;
 
-    let arch = match input.env.arch {
+    let arch = match env.arch {
         HostArch::Arm64 => "aarch64",
         HostArch::X64 => "x86_64",
         _ => unreachable!(),
     };
 
-    let filename = match input.env.os {
+    let filename = match env.os {
         HostOS::Linux => format!("deno-{arch}-unknown-linux-gnu.zip"),
         HostOS::MacOS => format!("deno-{arch}-apple-darwin.zip"),
         HostOS::Windows => format!("deno-{arch}-pc-windows-msvc.zip"),
@@ -58,9 +60,11 @@ pub fn download_prebuilt(
 }
 
 #[plugin_fn]
-pub fn locate_bins(Json(input): Json<LocateBinsInput>) -> FnResult<Json<LocateBinsOutput>> {
+pub fn locate_bins(Json(_): Json<LocateBinsInput>) -> FnResult<Json<LocateBinsOutput>> {
+    let env = get_proto_environment()?;
+
     Ok(Json(LocateBinsOutput {
-        bin_path: Some(format_bin_name(BIN, input.env.os).into()),
+        bin_path: Some(format_bin_name(BIN, env.os).into()),
         fallback_last_globals_dir: true,
         globals_lookup_dirs: vec![
             "$DENO_INSTALL_ROOT".into(),
