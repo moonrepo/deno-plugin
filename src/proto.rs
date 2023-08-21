@@ -100,6 +100,7 @@ pub fn install_global(
     Json(input): Json<InstallGlobalInput>,
 ) -> FnResult<Json<InstallGlobalOutput>> {
     let result = exec_command!(
+        inherit,
         BIN,
         ["install", "--allow-net", "--allow-read", &input.dependency]
     );
@@ -111,7 +112,7 @@ pub fn install_global(
 pub fn uninstall_global(
     Json(input): Json<UninstallGlobalInput>,
 ) -> FnResult<Json<UninstallGlobalOutput>> {
-    let result = exec_command!(BIN, ["uninstall", &input.dependency]);
+    let result = exec_command!(inherit, BIN, ["uninstall", &input.dependency]);
 
     Ok(Json(UninstallGlobalOutput::from_exec_command(result)))
 }
