@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.1
+
+#### 🚀 Updates
+
+- Updated to support proto v0.16 release.
+
+#### 🐞 Fixes
+
+- Fixed an issue where the globals directory for `DENO_INSTALL_ROOT` was incorrect.
+
 ## 0.2.0
 
 #### 🚀 Updates

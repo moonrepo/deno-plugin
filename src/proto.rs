@@ -67,7 +67,7 @@ pub fn locate_bins(Json(_): Json<LocateBinsInput>) -> FnResult<Json<LocateBinsOu
         bin_path: Some(format_bin_name(BIN, env.os).into()),
         fallback_last_globals_dir: true,
         globals_lookup_dirs: vec![
-            "$DENO_INSTALL_ROOT".into(),
+            "$DENO_INSTALL_ROOT/bin".into(),
             "$DENO_HOME/bin".into(),
             "$HOME/.deno/bin".into(),
         ],
