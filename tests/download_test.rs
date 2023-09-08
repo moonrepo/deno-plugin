@@ -3,6 +3,8 @@ use starbase_sandbox::create_empty_sandbox;
 
 generate_download_install_tests!("deno-test", "1.30.0");
 
+// Deno doesn't provide canary builds for MacOS M1
+#[cfg(not(target_os = "macos"))]
 mod canary {
     use super::*;
 
@@ -33,9 +35,8 @@ fn doesnt_support_linux_arm64() {
             checksum_name: None,
             checksum_url: None,
             download_name: Some("deno-aarch64-unknown-linux-gnu.zip".into()),
-            download_url:
-                "https://github.com/denoland/deno/releases/download/v1.2.0/deno-aarch64-unknown-linux-gnu.zip"
-                    .into()
+            download_url: "https://dl.deno.land/release/v1.2.0/deno-aarch64-unknown-linux-gnu.zip"
+                .into()
         }
     );
 }
@@ -63,7 +64,8 @@ fn supports_linux_x64() {
             checksum_name: None,
             checksum_url: None,
             download_name: Some("deno-x86_64-unknown-linux-gnu.zip".into()),
-            download_url: "https://github.com/denoland/deno/releases/download/v1.2.0/deno-x86_64-unknown-linux-gnu.zip".into()
+            download_url: "https://dl.deno.land/release/v1.2.0/deno-x86_64-unknown-linux-gnu.zip"
+                .into()
         }
     );
 }
@@ -91,9 +93,8 @@ fn supports_macos_arm64() {
             checksum_name: None,
             checksum_url: None,
             download_name: Some("deno-aarch64-apple-darwin.zip".into()),
-            download_url:
-                "https://github.com/denoland/deno/releases/download/v1.2.0/deno-aarch64-apple-darwin.zip"
-                    .into()
+            download_url: "https://dl.deno.land/release/v1.2.0/deno-aarch64-apple-darwin.zip"
+                .into()
         }
     );
 }
@@ -121,7 +122,7 @@ fn supports_macos_x64() {
             checksum_name: None,
             checksum_url: None,
             download_name: Some("deno-x86_64-apple-darwin.zip".into()),
-            download_url: "https://github.com/denoland/deno/releases/download/v1.2.0/deno-x86_64-apple-darwin.zip".into()
+            download_url: "https://dl.deno.land/release/v1.2.0/deno-x86_64-apple-darwin.zip".into()
         }
     );
 }
@@ -150,7 +151,8 @@ fn doesnt_support_windows_arm64() {
             checksum_name: None,
             checksum_url: None,
             download_name: Some("deno-aarch64-pc-windows-msvc.zip".into()),
-            download_url: "https://github.com/denoland/deno/releases/download/v1.2.0/deno-aarch64-pc-windows-msvc.zip".into()
+            download_url: "https://dl.deno.land/release/v1.2.0/deno-aarch64-pc-windows-msvc.zip"
+                .into()
         }
     );
 }
@@ -178,7 +180,8 @@ fn supports_windows_x64() {
             checksum_name: None,
             checksum_url: None,
             download_name: Some("deno-x86_64-pc-windows-msvc.zip".into()),
-            download_url: "https://github.com/denoland/deno/releases/download/v1.2.0/deno-x86_64-pc-windows-msvc.zip".into()
+            download_url: "https://dl.deno.land/release/v1.2.0/deno-x86_64-pc-windows-msvc.zip"
+                .into()
         }
     );
 }
