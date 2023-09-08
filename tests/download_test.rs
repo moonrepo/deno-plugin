@@ -3,6 +3,12 @@ use starbase_sandbox::create_empty_sandbox;
 
 generate_download_install_tests!("deno-test", "1.30.0");
 
+mod canary {
+    use super::*;
+
+    generate_download_install_tests!("deno-test", "canary");
+}
+
 #[test]
 #[should_panic(expected = "Unable to install Deno, unsupported architecture arm64 for linux.")]
 fn doesnt_support_linux_arm64() {

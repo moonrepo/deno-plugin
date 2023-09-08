@@ -50,10 +50,24 @@ pub fn download_prebuilt(
         _ => unreachable!(),
     };
 
+    let download_url = match version.as_ref() {
+        "canary" => {
+            let commit = fetch_url_text("https://dl.deno.land/canary-latest.txt")?;
+
+            format!("https://dl.deno.land/canary/{}/{filename}", commit.trim())
+        }
+        "latest" => {
+            let tag = fetch_url_text("https://dl.deno.land/release-latest.txt")?;
+
+            format!("https://dl.deno.land/release/{tag}/{filename}")
+        }
+        _ => {
+            format!("https://dl.deno.land/release/v{version}/{filename}")
+        }
+    };
+
     Ok(Json(DownloadPrebuiltOutput {
-        download_url: format!(
-            "https://github.com/denoland/deno/releases/download/v{version}/{filename}"
-        ),
+        download_url,
         download_name: Some(filename),
         ..DownloadPrebuiltOutput::default()
     }))
