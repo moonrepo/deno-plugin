@@ -28,15 +28,14 @@ fn doesnt_support_linux_arm64() {
             context: ToolContext {
                 version: "1.2.0".into(),
                 ..Default::default()
-            }
+            },
+            ..Default::default()
         }),
         DownloadPrebuiltOutput {
-            archive_prefix: None,
-            checksum_name: None,
-            checksum_url: None,
             download_name: Some("deno-aarch64-unknown-linux-gnu.zip".into()),
             download_url: "https://dl.deno.land/release/v1.2.0/deno-aarch64-unknown-linux-gnu.zip"
-                .into()
+                .into(),
+            ..Default::default()
         }
     );
 }
@@ -57,15 +56,14 @@ fn supports_linux_x64() {
             context: ToolContext {
                 version: "1.2.0".into(),
                 ..Default::default()
-            }
+            },
+            ..Default::default()
         }),
         DownloadPrebuiltOutput {
-            archive_prefix: None,
-            checksum_name: None,
-            checksum_url: None,
             download_name: Some("deno-x86_64-unknown-linux-gnu.zip".into()),
             download_url: "https://dl.deno.land/release/v1.2.0/deno-x86_64-unknown-linux-gnu.zip"
-                .into()
+                .into(),
+            ..Default::default()
         }
     );
 }
@@ -86,15 +84,14 @@ fn supports_macos_arm64() {
             context: ToolContext {
                 version: "1.2.0".into(),
                 ..Default::default()
-            }
+            },
+            ..Default::default()
         }),
         DownloadPrebuiltOutput {
-            archive_prefix: None,
-            checksum_name: None,
-            checksum_url: None,
             download_name: Some("deno-aarch64-apple-darwin.zip".into()),
             download_url: "https://dl.deno.land/release/v1.2.0/deno-aarch64-apple-darwin.zip"
-                .into()
+                .into(),
+            ..Default::default()
         }
     );
 }
@@ -115,14 +112,13 @@ fn supports_macos_x64() {
             context: ToolContext {
                 version: "1.2.0".into(),
                 ..Default::default()
-            }
+            },
+            ..Default::default()
         }),
         DownloadPrebuiltOutput {
-            archive_prefix: None,
-            checksum_name: None,
-            checksum_url: None,
             download_name: Some("deno-x86_64-apple-darwin.zip".into()),
-            download_url: "https://dl.deno.land/release/v1.2.0/deno-x86_64-apple-darwin.zip".into()
+            download_url: "https://dl.deno.land/release/v1.2.0/deno-x86_64-apple-darwin.zip".into(),
+            ..Default::default()
         }
     );
 }
@@ -144,15 +140,14 @@ fn doesnt_support_windows_arm64() {
             context: ToolContext {
                 version: "1.2.0".into(),
                 ..Default::default()
-            }
+            },
+            ..Default::default()
         }),
         DownloadPrebuiltOutput {
-            archive_prefix: None,
-            checksum_name: None,
-            checksum_url: None,
             download_name: Some("deno-aarch64-pc-windows-msvc.zip".into()),
             download_url: "https://dl.deno.land/release/v1.2.0/deno-aarch64-pc-windows-msvc.zip"
-                .into()
+                .into(),
+            ..Default::default()
         }
     );
 }
@@ -173,15 +168,14 @@ fn supports_windows_x64() {
             context: ToolContext {
                 version: "1.2.0".into(),
                 ..Default::default()
-            }
+            },
+            ..Default::default()
         }),
         DownloadPrebuiltOutput {
-            archive_prefix: None,
-            checksum_name: None,
-            checksum_url: None,
             download_name: Some("deno-x86_64-pc-windows-msvc.zip".into()),
             download_url: "https://dl.deno.land/release/v1.2.0/deno-x86_64-pc-windows-msvc.zip"
-                .into()
+                .into(),
+            ..Default::default()
         }
     );
 }
