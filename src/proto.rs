@@ -51,20 +51,18 @@ pub fn download_prebuilt(
         _ => unreachable!(),
     };
 
-    let download_url = match version.as_ref() {
-        "canary" => {
-            let commit = fetch_url_text("https://dl.deno.land/canary-latest.txt")?;
-
-            format!("https://dl.deno.land/canary/{}/{filename}", commit.trim())
-        }
-        "latest" => {
-            let tag = fetch_url_text("https://dl.deno.land/release-latest.txt")?;
-
-            format!("https://dl.deno.land/release/{tag}/{filename}")
-        }
-        _ => {
-            format!("https://dl.deno.land/release/v{version}/{filename}")
-        }
+    let download_url = if version.is_canary() {
+        format!(
+            "https://dl.deno.land/canary/{}/{filename}",
+            fetch_url_text("https://dl.deno.land/canary-latest.txt")?.trim()
+        )
+    } else if version.is_latest() {
+        format!(
+            "https://dl.deno.land/release/{}/{filename}",
+            fetch_url_text("https://dl.deno.land/release-latest.txt")?.trim()
+        )
+    } else {
+        format!("https://dl.deno.land/release/v{}/{filename}", version)
     };
 
     Ok(Json(DownloadPrebuiltOutput {
@@ -96,7 +94,6 @@ pub fn load_versions(Json(_): Json<LoadVersionsInput>) -> FnResult<Json<LoadVers
 
     let tags = tags
         .iter()
-        .filter(|t| !t.ends_with("^{}"))
         .filter_map(|t| t.strip_prefix('v').map(|t| t.to_owned()))
         .collect::<Vec<_>>();
 
