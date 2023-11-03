@@ -36,13 +36,15 @@ pub fn download_prebuilt(
         ],
     )?;
 
-    let version = input.context.version;
+    let version = &input.context.version;
 
     let arch = match env.arch {
         HostArch::Arm64 => "aarch64",
         HostArch::X64 => "x86_64",
         _ => unreachable!(),
     };
+
+    dbg!(&arch);
 
     let filename = match env.os {
         HostOS::Linux => format!("deno-{arch}-unknown-linux-gnu.zip"),
@@ -51,18 +53,18 @@ pub fn download_prebuilt(
         _ => unreachable!(),
     };
 
+    dbg!(&filename);
+
     let download_url = if version.is_canary() {
-        format!(
-            "https://dl.deno.land/canary/{}/{filename}",
-            fetch_url_text("https://dl.deno.land/canary-latest.txt")?.trim()
-        )
+        let hash = fetch_url_text("https://dl.deno.land/canary-latest.txt")?;
+
+        format!("https://dl.deno.land/canary/{}/{filename}", hash.trim())
     } else if version.is_latest() {
-        format!(
-            "https://dl.deno.land/release/{}/{filename}",
-            fetch_url_text("https://dl.deno.land/release-latest.txt")?.trim()
-        )
+        let tag = fetch_url_text("https://dl.deno.land/release-latest.txt")?;
+
+        format!("https://dl.deno.land/release/{}/{filename}", tag.trim())
     } else {
-        format!("https://dl.deno.land/release/v{}/{filename}", version)
+        format!("https://dl.deno.land/release/v{version}/{filename}")
     };
 
     dbg!(&download_url);
