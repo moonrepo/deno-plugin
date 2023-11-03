@@ -67,7 +67,7 @@ pub fn download_prebuilt(
         format!("https://dl.deno.land/release/v{version}/{filename}")
     };
 
-    dbg!(&download_url);
+    dbg!(&download_url, "bump");
 
     Ok(Json(DownloadPrebuiltOutput {
         download_url,
