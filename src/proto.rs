@@ -101,7 +101,7 @@ pub fn locate_executables(
             "$DENO_HOME/bin".into(),
             "$HOME/.deno/bin".into(),
         ],
-        primary: Some(ExecutableConfig::new(format_bin_name(BIN, env.os))),
+        primary: Some(ExecutableConfig::new(env.os.get_exe_name(BIN))),
         ..LocateExecutablesOutput::default()
     }))
 }
@@ -136,7 +136,7 @@ pub fn locate_bins(Json(_): Json<LocateBinsInput>) -> FnResult<Json<LocateBinsOu
     let env = get_proto_environment()?;
 
     Ok(Json(LocateBinsOutput {
-        bin_path: Some(format_bin_name(BIN, env.os).into()),
+        bin_path: Some(env.os.get_exe_name(BIN).into()),
         fallback_last_globals_dir: true,
         globals_lookup_dirs: vec![
             "$DENO_INSTALL_ROOT/bin".into(),
