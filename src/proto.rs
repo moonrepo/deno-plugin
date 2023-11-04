@@ -21,6 +21,25 @@ pub fn register_tool(Json(_): Json<ToolMetadataInput>) -> FnResult<Json<ToolMeta
 }
 
 #[plugin_fn]
+pub fn detect_version_files(_: ()) -> FnResult<Json<DetectVersionOutput>> {
+    Ok(Json(DetectVersionOutput {
+        files: vec![".dvmrc".into()],
+    }))
+}
+
+#[plugin_fn]
+pub fn load_versions(Json(_): Json<LoadVersionsInput>) -> FnResult<Json<LoadVersionsOutput>> {
+    let tags = load_git_tags("https://github.com/denoland/deno")?;
+
+    let tags = tags
+        .iter()
+        .filter_map(|t| t.strip_prefix('v').map(|t| t.to_owned()))
+        .collect::<Vec<_>>();
+
+    Ok(Json(LoadVersionsOutput::from(tags)?))
+}
+
+#[plugin_fn]
 pub fn download_prebuilt(
     Json(input): Json<DownloadPrebuiltInput>,
 ) -> FnResult<Json<DownloadPrebuiltOutput>> {
@@ -44,16 +63,12 @@ pub fn download_prebuilt(
         _ => unreachable!(),
     };
 
-    dbg!(&arch);
-
     let filename = match env.os {
         HostOS::Linux => format!("deno-{arch}-unknown-linux-gnu.zip"),
         HostOS::MacOS => format!("deno-{arch}-apple-darwin.zip"),
         HostOS::Windows => format!("deno-{arch}-pc-windows-msvc.zip"),
         _ => unreachable!(),
     };
-
-    dbg!(&filename);
 
     let download_url = if version.is_canary() {
         let hash = fetch_url_text("https://dl.deno.land/canary-latest.txt")?;
@@ -67,8 +82,6 @@ pub fn download_prebuilt(
         format!("https://dl.deno.land/release/v{version}/{filename}")
     };
 
-    dbg!(&download_url, "bump");
-
     Ok(Json(DownloadPrebuiltOutput {
         download_url,
         download_name: Some(filename),
@@ -77,37 +90,19 @@ pub fn download_prebuilt(
 }
 
 #[plugin_fn]
-pub fn locate_bins(Json(_): Json<LocateBinsInput>) -> FnResult<Json<LocateBinsOutput>> {
+pub fn locate_executables(
+    Json(_): Json<LocateExecutablesInput>,
+) -> FnResult<Json<LocateExecutablesOutput>> {
     let env = get_proto_environment()?;
 
-    Ok(Json(LocateBinsOutput {
-        bin_path: Some(format_bin_name(BIN, env.os).into()),
-        fallback_last_globals_dir: true,
+    Ok(Json(LocateExecutablesOutput {
         globals_lookup_dirs: vec![
             "$DENO_INSTALL_ROOT/bin".into(),
             "$DENO_HOME/bin".into(),
             "$HOME/.deno/bin".into(),
         ],
-        ..LocateBinsOutput::default()
-    }))
-}
-
-#[plugin_fn]
-pub fn load_versions(Json(_): Json<LoadVersionsInput>) -> FnResult<Json<LoadVersionsOutput>> {
-    let tags = load_git_tags("https://github.com/denoland/deno")?;
-
-    let tags = tags
-        .iter()
-        .filter_map(|t| t.strip_prefix('v').map(|t| t.to_owned()))
-        .collect::<Vec<_>>();
-
-    Ok(Json(LoadVersionsOutput::from(tags)?))
-}
-
-#[plugin_fn]
-pub fn detect_version_files(_: ()) -> FnResult<Json<DetectVersionOutput>> {
-    Ok(Json(DetectVersionOutput {
-        files: vec![".dvmrc".into()],
+        primary: Some(ExecutableConfig::new(format_bin_name(BIN, env.os))),
+        ..LocateExecutablesOutput::default()
     }))
 }
 
@@ -131,4 +126,23 @@ pub fn uninstall_global(
     let result = exec_command!(inherit, BIN, ["uninstall", &input.dependency]);
 
     Ok(Json(UninstallGlobalOutput::from_exec_command(result)))
+}
+
+// DEPRECATED
+// Remove in v0.23!
+
+#[plugin_fn]
+pub fn locate_bins(Json(_): Json<LocateBinsInput>) -> FnResult<Json<LocateBinsOutput>> {
+    let env = get_proto_environment()?;
+
+    Ok(Json(LocateBinsOutput {
+        bin_path: Some(format_bin_name(BIN, env.os).into()),
+        fallback_last_globals_dir: true,
+        globals_lookup_dirs: vec![
+            "$DENO_INSTALL_ROOT/bin".into(),
+            "$DENO_HOME/bin".into(),
+            "$HOME/.deno/bin".into(),
+        ],
+        ..LocateBinsOutput::default()
+    }))
 }
