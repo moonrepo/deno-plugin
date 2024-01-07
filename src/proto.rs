@@ -34,7 +34,7 @@ pub fn load_versions(Json(_): Json<LoadVersionsInput>) -> FnResult<Json<LoadVers
 
     let tags = tags
         .iter()
-        .filter_map(|t| t.strip_prefix('v').map(|t| t.to_owned()))
+        .filter_map(|tag| tag.strip_prefix('v').map(|tag| tag.to_owned()))
         .collect::<Vec<_>>();
 
     Ok(Json(LoadVersionsOutput::from(tags)?))
@@ -127,23 +127,4 @@ pub fn uninstall_global(
     let result = exec_command!(inherit, BIN, ["uninstall", &input.dependency]);
 
     Ok(Json(UninstallGlobalOutput::from_exec_command(result)))
-}
-
-// DEPRECATED
-// Remove in v0.23!
-
-#[plugin_fn]
-pub fn locate_bins(Json(_): Json<LocateBinsInput>) -> FnResult<Json<LocateBinsOutput>> {
-    let env = get_proto_environment()?;
-
-    Ok(Json(LocateBinsOutput {
-        bin_path: Some(env.os.get_exe_name(BIN).into()),
-        fallback_last_globals_dir: true,
-        globals_lookup_dirs: vec![
-            "$DENO_INSTALL_ROOT/bin".into(),
-            "$DENO_HOME/bin".into(),
-            "$HOME/.deno/bin".into(),
-        ],
-        ..LocateBinsOutput::default()
-    }))
 }
