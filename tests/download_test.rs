@@ -13,8 +13,7 @@ mod canary {
 }
 
 #[test]
-#[should_panic(expected = "Unable to install Deno, unsupported architecture arm64 for linux.")]
-fn doesnt_support_linux_arm64() {
+fn supports_linux_arm64() {
     let sandbox = create_empty_sandbox();
     let plugin = create_plugin_with_config(
         "deno-test",
@@ -25,14 +24,14 @@ fn doesnt_support_linux_arm64() {
     assert_eq!(
         plugin.download_prebuilt(DownloadPrebuiltInput {
             context: ToolContext {
-                version: VersionSpec::parse("1.2.0").unwrap(),
+                version: VersionSpec::parse("1.41.0").unwrap(),
                 ..Default::default()
             },
             ..Default::default()
         }),
         DownloadPrebuiltOutput {
             download_name: Some("deno-aarch64-unknown-linux-gnu.zip".into()),
-            download_url: "https://dl.deno.land/release/v1.2.0/deno-aarch64-unknown-linux-gnu.zip"
+            download_url: "https://dl.deno.land/release/v1.41.0/deno-aarch64-unknown-linux-gnu.zip"
                 .into(),
             ..Default::default()
         }

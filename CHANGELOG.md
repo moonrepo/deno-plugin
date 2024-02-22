@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.1
+
+#### 🚀 Updates
+
+- Added Linux ARM64 support (requires Deno >= v1.41).
+
 ## 0.9.0
 
 #### 🚀 Updates
