@@ -50,7 +50,7 @@ pub fn download_prebuilt(
         NAME,
         &env,
         permutations! [
-            HostOS::Linux => [HostArch::X64],
+            HostOS::Linux => [HostArch::X64, HostArch::Arm64],
             HostOS::MacOS => [HostArch::X64, HostArch::Arm64],
             HostOS::Windows => [HostArch::X64],
         ],
