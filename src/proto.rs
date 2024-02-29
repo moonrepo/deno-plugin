@@ -106,25 +106,3 @@ pub fn locate_executables(
         ..LocateExecutablesOutput::default()
     }))
 }
-
-#[plugin_fn]
-pub fn install_global(
-    Json(input): Json<InstallGlobalInput>,
-) -> FnResult<Json<InstallGlobalOutput>> {
-    let result = exec_command!(
-        inherit,
-        BIN,
-        ["install", "--allow-net", "--allow-read", &input.dependency]
-    );
-
-    Ok(Json(InstallGlobalOutput::from_exec_command(result)))
-}
-
-#[plugin_fn]
-pub fn uninstall_global(
-    Json(input): Json<UninstallGlobalInput>,
-) -> FnResult<Json<UninstallGlobalOutput>> {
-    let result = exec_command!(inherit, BIN, ["uninstall", &input.dependency]);
-
-    Ok(Json(UninstallGlobalOutput::from_exec_command(result)))
-}
