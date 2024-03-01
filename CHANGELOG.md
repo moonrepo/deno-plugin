@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.10.0
+
+#### 💥 Breaking
+
+- Removed `install_global`, use `deno install` instead.
+- Removed `uninstall_global`, use `deno uninstall` instead.
+
+#### 🚀 Updates
+
+- Updated to support proto v0.31 release.
+- Updated dependencies.
+
 ## 0.9.1
 
 #### 🚀 Updates
