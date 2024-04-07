@@ -15,7 +15,7 @@ deno = "source:https://github.com/moonrepo/deno-plugin/releases/download/vX.Y.Z/
 
 Deno plugin can be configured with a `.prototools` file.
 
-- `dist-url` (string) - The distribution URL to download Node.js archives from. Supports `{version}` and `{file}` tokens.
+- `dist-url` (string) - The distribution URL to download Deno archives from. Supports `{version}` and `{file}` tokens.
 
 ```toml
 [tools.deno]
