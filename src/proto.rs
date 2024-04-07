@@ -1,7 +1,6 @@
+use crate::config::DenoPluginConfig;
 use extism_pdk::*;
 use proto_pdk::*;
-
-use crate::config::DenoPluginConfig;
 
 #[host_fn]
 extern "ExtismHost" {
