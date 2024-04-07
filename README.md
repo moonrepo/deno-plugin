@@ -13,7 +13,14 @@ deno = "source:https://github.com/moonrepo/deno-plugin/releases/download/vX.Y.Z/
 
 ## Configuration
 
-Deno plugin does not support configuration.
+Deno plugin can be configured with a `.prototools` file.
+
+- `dist-url` (string) - The distribution URL to download Deno archives from. Supports `{version}` and `{file}` tokens.
+
+```toml
+[tools.deno]
+dist-url = "https://..."
+```
 
 ## Hooks
 

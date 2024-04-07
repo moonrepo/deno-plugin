@@ -1,3 +1,4 @@
+use crate::config::DenoPluginConfig;
 use extism_pdk::*;
 use proto_pdk::*;
 
@@ -80,7 +81,12 @@ pub fn download_prebuilt(
 
         format!("https://dl.deno.land/release/{}/{filename}", tag.trim())
     } else {
-        format!("https://dl.deno.land/release/v{version}/{filename}")
+        let config = get_tool_config::<DenoPluginConfig>()?;
+
+        config
+            .dist_url
+            .replace("{version}", &version.to_string())
+            .replace("{file}", &filename)
     };
 
     Ok(Json(DownloadPrebuiltOutput {
