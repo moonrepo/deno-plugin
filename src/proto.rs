@@ -71,7 +71,7 @@ pub fn build_instructions(
             SystemDependency::for_os("protobuf-compiler", HostOS::Linux),
             // macOS
             SystemDependency::for_os("cmake", HostOS::MacOS),
-            SystemDependency::for_os_arch("llvm", HostOS::MacOS, HostArch::LongArm64),
+            SystemDependency::for_os_arch("llvm", HostOS::MacOS, HostArch::Arm64),
             SystemDependency::for_os("protobuf", HostOS::MacOS),
             // Windows
         ],
@@ -96,13 +96,10 @@ pub fn build_instructions(
         // Not sure if these apply to all Linux based...
         _ => {
             output.instructions.extend(vec![
-                BuildInstruction::RunCommand(CommandInstruction::new(
-                    "wget",
-                    ["https://apt.llvm.org/llvm.sh"],
-                )),
-                BuildInstruction::RunCommand(CommandInstruction::new("chmod", ["+x", "llvm.sh"])),
+                BuildInstruction::RequestScript("https://apt.llvm.org/llvm.sh".into()),
+                BuildInstruction::MakeExecutable("llvm.sh".into()),
                 BuildInstruction::RunCommand(CommandInstruction::new("./llvm.sh", ["16"])),
-                BuildInstruction::RunCommand(CommandInstruction::new("rm", ["-f", "./llvm.sh"])),
+                BuildInstruction::RemoveFile("./llvm.sh".into()),
             ]);
         }
     };
@@ -112,8 +109,8 @@ pub fn build_instructions(
 
     output.instructions.extend(vec![
         BuildInstruction::RunCommand(CommandInstruction::new("cargo", ["build", "-vv"])),
-        BuildInstruction::RunCommand(CommandInstruction::new("mv", [&target_bin, "."])),
-        BuildInstruction::RunCommand(CommandInstruction::new("rm", ["-rf", "target"])),
+        BuildInstruction::MoveFile(target_bin.into(), ".".into()),
+        BuildInstruction::RemoveDir("target".into()),
     ]);
 
     Ok(Json(output))
