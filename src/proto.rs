@@ -41,6 +41,81 @@ pub fn load_versions(Json(_): Json<LoadVersionsInput>) -> FnResult<Json<LoadVers
     Ok(Json(LoadVersionsOutput::from(tags)?))
 }
 
+// https://docs.deno.com/runtime/manual/references/contributing/building_from_source
+#[plugin_fn]
+pub fn build_instructions(
+    Json(_): Json<BuildInstructionsInput>,
+) -> FnResult<Json<BuildInstructionsOutput>> {
+    let env = get_host_environment()?;
+
+    let mut output = BuildInstructionsOutput {
+        source: SourceLocation::Git(GitSource {
+            url: "https://github.com/denoland/deno.git".into(),
+            reference: "main".into(), // TODO
+            submodules: true,
+        }),
+        help_url: Some(
+            "https://docs.deno.com/runtime/manual/references/contributing/building_from_source"
+                .into(),
+        ),
+        requirements: vec![
+            BuildRequirement::CommandExistsOnPath("cargo".into()),
+            BuildRequirement::GitVersion(VersionReq::parse(">=2.19.2")?),
+            BuildRequirement::PythonVersion(VersionReq::parse(">=3")?),
+            BuildRequirement::XcodeCommandLineTools,
+        ],
+        system_dependencies: vec![
+            // Linux
+            SystemDependency::for_os("cmake", HostOS::Linux),
+            SystemDependency::for_os("libglib2.0-dev", HostOS::Linux),
+            SystemDependency::for_os("protobuf-compiler", HostOS::Linux),
+            // macOS
+            SystemDependency::for_os("cmake", HostOS::MacOS),
+            SystemDependency::for_os_arch("llvm", HostOS::MacOS, HostArch::Arm64),
+            SystemDependency::for_os("protobuf", HostOS::MacOS),
+            // Windows
+        ],
+        ..Default::default()
+    };
+
+    match env.os {
+        HostOS::MacOS => {}
+        HostOS::Windows => {
+            output.requirements.extend(vec![
+                BuildRequirement::GitConfigSetting(
+                    "core.symlinks".into(),
+                    "true".into(),
+                ),
+                BuildRequirement::ManualIntercept(
+                    "https://docs.deno.com/runtime/manual/references/contributing/building_from_source#native-compilers-and-linkers".into(),
+                ),
+            ]);
+
+            // TODO download protobuf
+        }
+        // Not sure if these apply to all Linux based...
+        _ => {
+            output.instructions.extend(vec![
+                BuildInstruction::RequestScript("https://apt.llvm.org/llvm.sh".into()),
+                BuildInstruction::MakeExecutable("llvm.sh".into()),
+                BuildInstruction::RunCommand(CommandInstruction::new("./llvm.sh", ["16"])),
+                BuildInstruction::RemoveFile("./llvm.sh".into()),
+            ]);
+        }
+    };
+
+    // These must come last as it's the actual command to build the binary!
+    let target_bin = env.os.get_exe_name("target/debug/deno");
+
+    output.instructions.extend(vec![
+        BuildInstruction::RunCommand(CommandInstruction::new("cargo", ["build", "-vv"])),
+        BuildInstruction::MoveFile(target_bin.into(), ".".into()),
+        BuildInstruction::RemoveDir("target".into()),
+    ]);
+
+    Ok(Json(output))
+}
+
 #[plugin_fn]
 pub fn download_prebuilt(
     Json(input): Json<DownloadPrebuiltInput>,
