@@ -50,6 +50,6 @@ jobs:
           cache: false
       - uses: moonrepo/setup-toolchain@v0
       - if: ${{ matrix.os == 'macos-latest' }}
-        run: brew install openssl
+        run: brew uninstall openssl && brew install openssl
       - uses: moonrepo/build-wasm-plugin@v0
       - run: cargo nextest run --no-default-features
