@@ -1,3 +1,5 @@
+> # Migrated to a new repository: https://github.com/moonrepo/tools
+
 # Deno plugin
 
 [Deno](https://deno.land/) WASM plugin for [proto](https://github.com/moonrepo/proto).
